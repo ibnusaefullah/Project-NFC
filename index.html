@@ -156,19 +156,42 @@
                 }
             };
 
+            // --- FUNGSI DIPERBARUI ---
             const sendWhatsAppNotification = async (phoneNumber, studentName, scanType, timestamp) => {
                 if (!phoneNumber || !phoneNumber.toString().startsWith('62')) {
                     console.error('Nomor telepon orang tua tidak valid:', phoneNumber);
                     return; 
                 }
 
+                // Opsi untuk format tanggal dan waktu
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = timestamp.toLocaleDateString('id-ID', dateOptions);
                 const timeString = timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-                const message = `Pemberitahuan Presensi:\n\nAnanda: *${studentName}*\nStatus: *Berhasil Presensi ${scanType}*\nWaktu: ${timeString} WIB\n\nTerima kasih.`;
+                
+                let message = '';
+
+                // Membuat pesan berdasarkan tipe presensi
+                if (scanType === 'Masuk') {
+                    message = `Assalamu’alaikum Warahmatullahi Wabarakatuh.\n\n` +
+                              `Kami informasikan bahwa ananda *${studentName}* telah melakukan presensi masuk pada:\n\n` +
+                              `🗓️ Hari/Tanggal: ${formattedDate}\n` +
+                              `🕒 Waktu: ${timeString} WIB\n` +
+                              `📍 Lokasi: UPTD SD Negeri 3 Pekandangan\n\n` +
+                              `Semoga kegiatan belajar hari ini berjalan lancar dan penuh semangat. Terima kasih atas perhatian dan doa dari orang tua/wali.`;
+                } else if (scanType === 'Pulang') {
+                    message = `Assalamu’alaikum Warahmatullahi Wabarakatuh.\n\n` +
+                              `Kami informasikan bahwa ananda *${studentName}* telah melakukan presensi pulang dari sekolah pada:\n\n` +
+                              `🗓️ Hari/Tanggal: ${formattedDate}\n` +
+                              `🕒 Waktu: ${timeString} WIB\n` +
+                              `📍 Lokasi: UPTD SD Negeri 3 Pekandangan\n\n` +
+                              `Mohon kepada orang tua/wali untuk segera menjemput ananda demi kenyamanan dan keamanan bersama.\n` +
+                              `Terima kasih atas perhatian dan kerjasamanya.`;
+                } else {
+                    // Fallback jika tipe scan tidak dikenali
+                    message = `Pemberitahuan Presensi:\n\nAnanda: *${studentName}*\nStatus: *Berhasil Presensi ${scanType}*\nWaktu: ${timeString} WIB\n\nTerima kasih.`;
+                }
                 
                 const encodedMessage = encodeURIComponent(message);
-                
-                // --- PERBAIKAN DI SINI ---
-                // Menggunakan variabel phoneNumber dan TEXTMEBOT_API_KEY, bukan nilai hardcoded.
                 const apiUrl = `https://api.textmebot.com/send.php?recipient=+${phoneNumber}&text=${encodedMessage}&apikey=${TEXTMEBOT_API_KEY}`;
 
                 try {
