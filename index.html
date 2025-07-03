@@ -98,8 +98,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // === GANTI DENGAN URL WEB APP ANDA DARI GOOGLE APPS SCRIPT ===
-            const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxtQ3-VLEY_Y6pMCOKAgGg8PKwBG6rvHS6EbcByAQztLn3TLp0FmIMDVa71lcXESWlo/exec'; // <--- PENTING: GANTI URL INI
+            // === URL WEB APP ANDA DARI GOOGLE APPS SCRIPT ===
+            const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxtQ3-VLEY_Y6pMCOKAgGg8PKwBG6rvHS6EbcByAQztLn3TLp0FmIMDVa71lcXESWlo/exec';
 
             const scanMasukButton = document.getElementById('scanMasukButton');
             const scanPulangButton = document.getElementById('scanPulangButton');
@@ -124,7 +124,9 @@
 
             // Fungsi untuk memulai scan
             const startScan = async (scanType) => {
-                if (GAS_WEB_APP_URL.includes('https://script.google.com/macros/s/AKfycbxtQ3-VLEY_Y6pMCOKAgGg8PKwBG6rvHS6EbcByAQztLn3TLp0FmIMDVa71lcXESWlo/exec')) {
+                // === PERBAIKAN: Pemeriksaan diubah ke string placeholder generik ===
+                // Ini untuk memastikan Anda tidak sengaja menggunakan URL contoh.
+                if (GAS_WEB_APP_URL.includes('GANTI_DENGAN_URL_ANDA')) {
                     alert('PENTING: Harap ganti placeholder GAS_WEB_APP_URL di dalam kode JavaScript dengan URL Web App Anda yang sebenarnya.');
                     return;
                 }
