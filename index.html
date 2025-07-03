@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pembaca NISN NFC</title>
+    <title>Pembaca Kartu Pelajar NFC</title>
     <!-- Memuat Tailwind CSS untuk styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -52,7 +52,7 @@
                          </svg>
                     </div>
                 </div>
-                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai NISN NFC.</p>
+                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai Kartu Pelajar NFC.</p>
             </div>
 
             <!-- Tombol Aksi -->
@@ -112,13 +112,13 @@
                     await ndef.scan();
                     
                     console.log("Scan started successfully.");
-                    statusText.textContent = 'Dekatkan NISN NFC Anda...';
+                    statusText.textContent = 'Dekatkan Kartu Pelajar NFC Anda...';
                     promptDiv.classList.add('scanning-animation');
                     scanButton.textContent = 'Sedang Memindai...';
 
                     ndef.addEventListener('readingerror', () => {
-                        console.log("Error reading NFC NISN.");
-                        statusText.textContent = 'Gagal membaca NISN. Coba lagi.';
+                        console.log("Error reading NFC Kartu Pelajar.");
+                        statusText.textContent = 'Gagal membaca Kartu Pelajar. Coba lagi.';
                         promptDiv.classList.remove('scanning-animation');
                         scanButton.textContent = 'Mulai Memindai';
                     });
@@ -127,7 +127,7 @@
                         console.log(`> Serial Number: ${serialNumber}`);
                         console.log(`> Records: (${message.records.length})`);
 
-                        statusText.textContent = 'NISN berhasil dibaca!';
+                        statusText.textContent = 'Kartu Pelajar berhasil dibaca!';
                         promptDiv.classList.remove('scanning-animation');
                         scanButton.textContent = 'Pindai Lagi';
 
