@@ -1,263 +1,232 @@
- <!DOCTYPE html> 
- <html lang="id"> 
- <head> 
-     <meta charset="UTF-8"> 
-     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
-     <title>Presensi Peserta Didik</title> 
-     <!-- Memuat Tailwind CSS --> 
-     <script src="https://cdn.tailwindcss.com"></script> 
-     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"> 
-     <style> 
-         /* Menggunakan font Inter */ 
-         body { 
-             font-family: 'Inter', sans-serif; 
-             -webkit-tap-highlight-color: transparent; /* Menghilangkan highlight biru saat di-tap di mobile */ 
-         } 
-         /* Gradient untuk tombol dan ikon */ 
-         .instagram-gradient { 
-             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
-         } 
-         /* Animasi untuk status scanning */ 
-         @keyframes pulse-light { 
-             0%, 100% { transform: scale(1); opacity: 1; } 
-             50% { transform: scale(1.05); opacity: 0.8; } 
-         } 
-         .scanning-animation { 
-             animation: pulse-light 1.5s ease-in-out infinite; 
-         } 
-         /* Mencegah scrolling */ 
-         html, body { 
-             height: 100%; 
-             overflow: hidden; 
-         } 
-     </style> 
- </head> 
- <body class="bg-gray-100"> 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Presensi Peserta Didik</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        /* Menggunakan font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Menghilangkan highlight biru saat di-tap di mobile */
+        }
+        /* Gradient untuk tombol dan ikon */
+        .instagram-gradient {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        /* Animasi untuk status scanning */
+        @keyframes pulse-light {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        .scanning-animation {
+            animation: pulse-light 1.5s ease-in-out infinite;
+        }
+        /* Mencegah scrolling */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
 
-     <!-- Kontainer utama full-screen --> 
-     <div class="w-full h-screen bg-white flex flex-col"> 
-          
-         <!-- Header Aplikasi --> 
-         <header class="text-center py-4 border-b border-gray-200 flex-shrink-0"> 
-             <h1 class="text-xl font-semibold text-gray-800">Presensi Peserta Didik</h1> 
-         </header> 
+    <!-- Kontainer utama full-screen -->
+    <div class="w-full h-screen bg-white flex flex-col">
+        
+        <!-- Header Aplikasi -->
+        <header class="text-center py-4 border-b border-gray-200 flex-shrink-0">
+            <h1 class="text-xl font-semibold text-gray-800">Presensi Peserta Didik</h1>
+        </header>
 
-         <!-- Konten Utama --> 
-         <main class="flex-grow flex flex-col justify-center items-center p-6 md:p-8 overflow-y-auto"> 
-             <!-- Area Prompt --> 
-             <div id="prompt" class="text-center mb-8"> 
-                 <div class="w-28 h-28 mx-auto rounded-full flex items-center justify-center instagram-gradient p-1"> 
-                     <div class="bg-white w-full h-full rounded-full flex items-center justify-center"> 
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> 
-                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /> 
-                         </svg> 
-                     </div> 
-                 </div> 
-                 <p id="statusText" class="text-gray-600 mt-5 font-medium text-lg">Pilih tipe presensi untuk memulai.</p> 
-             </div> 
+        <!-- Konten Utama -->
+        <main class="flex-grow flex flex-col justify-center items-center p-6 md:p-8 overflow-y-auto">
+            <!-- Area Prompt -->
+            <div id="prompt" class="text-center mb-8">
+                <div class="w-28 h-28 mx-auto rounded-full flex items-center justify-center instagram-gradient p-1">
+                    <div class="bg-white w-full h-full rounded-full flex items-center justify-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+                <p id="statusText" class="text-gray-600 mt-5 font-medium text-lg">Pilih tipe presensi untuk memulai.</p>
+            </div>
 
-             <!-- Tombol Aksi --> 
-             <div class="w-full max-w-xs space-y-4"> 
-                 <button id="scanMasukButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 bg-green-600 hover:bg-green-700"> 
-                     Presensi Masuk 
-                 </button> 
-                 <button id="scanPulangButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 bg-red-600 hover:bg-red-700"> 
-                     Presensi Pulang 
-                 </button> 
-             </div> 
-              
-             <!-- Pesan Error jika tidak didukung --> 
-             <div id="notSupported" class="hidden mt-6 text-center bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg" role="alert"> 
-                 <strong class="font-bold">Tidak Didukung!</strong> 
-                 <span class="block sm:inline">Web NFC tidak tersedia di browser atau perangkat ini.</span> 
-             </div> 
-         </main> 
-     </div> 
+            <!-- Tombol Aksi -->
+            <div class="w-full max-w-xs space-y-4">
+                <button id="scanMasukButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 bg-green-600 hover:bg-green-700">
+                    Presensi Masuk
+                </button>
+                <button id="scanPulangButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 bg-red-600 hover:bg-red-700">
+                    Presensi Pulang
+                </button>
+            </div>
+            
+            <!-- Pesan Error jika tidak didukung -->
+            <div id="notSupported" class="hidden mt-6 text-center bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                <strong class="font-bold">Tidak Didukung!</strong>
+                <span class="block sm:inline">Web NFC tidak tersedia di browser atau perangkat ini.</span>
+            </div>
+        </main>
+    </div>
 
-     <!-- Modal Notifikasi --> 
-     <div id="notificationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"> 
-         <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm w-full"> 
-             <div id="modalContent"> 
-                 <!-- Konten dinamis dari JS --> 
-             </div> 
-             <button id="closeModalButton" class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Tutup</button> 
-         </div> 
-     </div> 
-      
-     <!-- Overlay Loading --> 
-     <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"> 
-         <div class="text-white text-center"> 
-             <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> 
-                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> 
-                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> 
-             </svg> 
-             <p class="mt-4 text-lg">Mengirim data...</p> 
-         </div> 
-     </div> 
+    <!-- Modal Notifikasi -->
+    <div id="notificationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm w-full">
+            <div id="modalContent">
+                <!-- Konten dinamis dari JS -->
+            </div>
+            <button id="closeModalButton" class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Tutup</button>
+        </div>
+    </div>
+    
+    <!-- Overlay Loading -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="text-white text-center">
+            <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-4 text-lg">Mengirim data...</p>
+        </div>
+    </div>
 
 
-     <script> 
-         document.addEventListener('DOMContentLoaded', () => { 
-             // === URL WEB APP ANDA DARI GOOGLE APPS SCRIPT === 
-             const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxtQ3-VLEY_Y6pMCOKAgGg8PKwBG6rvHS6EbcByAQztLn3TLp0FmIMDVa71lcXESWlo/exec'; 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // === URL WEB APP ANDA DARI GOOGLE APPS SCRIPT ===
+            const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxtQ3-VLEY_Y6pMCOKAgGg8PKwBG6rvHS6EbcByAQztLn3TLp0FmIMDVa71lcXESWlo/exec';
 
-             const scanMasukButton = document.getElementById('scanMasukButton'); 
-             const scanPulangButton = document.getElementById('scanPulangButton'); 
-             const statusText = document.getElementById('statusText'); 
-             const promptDiv = document.getElementById('prompt'); 
-             const notSupportedDiv = document.getElementById('notSupported'); 
-             const loadingOverlay = document.getElementById('loadingOverlay'); 
-             const notificationModal = document.getElementById('notificationModal'); 
-             const modalContent = document.getElementById('modalContent'); 
-             const closeModalButton = document.getElementById('closeModalButton'); 
+            const scanMasukButton = document.getElementById('scanMasukButton');
+            const scanPulangButton = document.getElementById('scanPulangButton');
+            const statusText = document.getElementById('statusText');
+            const promptDiv = document.getElementById('prompt');
+            const notSupportedDiv = document.getElementById('notSupported');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const notificationModal = document.getElementById('notificationModal');
+            const modalContent = document.getElementById('modalContent');
+            const closeModalButton = document.getElementById('closeModalButton');
 
-             // Cek dukungan Web NFC 
-             if (!('NDEFReader' in window)) { 
-                 notSupportedDiv.classList.remove('hidden'); 
-                 scanMasukButton.disabled = true; 
-                 scanPulangButton.disabled = true; 
-                 scanMasukButton.classList.add('opacity-50', 'cursor-not-allowed'); 
-                 scanPulangButton.classList.add('opacity-50', 'cursor-not-allowed'); 
-                 statusText.textContent = 'Fitur tidak didukung.'; 
-                 return; 
-             } 
+            // Cek dukungan Web NFC
+            if (!('NDEFReader' in window)) {
+                notSupportedDiv.classList.remove('hidden');
+                scanMasukButton.disabled = true;
+                scanPulangButton.disabled = true;
+                scanMasukButton.classList.add('opacity-50', 'cursor-not-allowed');
+                scanPulangButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusText.textContent = 'Fitur tidak didukung.';
+                return;
+            }
 
-             // Fungsi untuk memulai scan 
-             const startScan = async (scanType) => { 
-                 if (GAS_WEB_APP_URL.includes('GANTI_DENGAN_URL_ANDA')) { 
-                     alert('PENTING: Harap ganti placeholder GAS_WEB_APP_URL di dalam kode JavaScript dengan URL Web App Anda yang sebenarnya.'); 
-                     return; 
-                 } 
+            // Fungsi untuk memulai scan
+            const startScan = async (scanType) => {
+                if (GAS_WEB_APP_URL.includes('GANTI_DENGAN_URL_ANDA')) {
+                    alert('PENTING: Harap ganti placeholder GAS_WEB_APP_URL di dalam kode JavaScript dengan URL Web App Anda yang sebenarnya.');
+                    return;
+                }
 
-                 statusText.textContent = 'Menunggu izin pengguna...'; 
-                 try { 
-                     const ndef = new NDEFReader(); 
-                     await ndef.scan(); 
-                      
-                     console.log("Scan started successfully."); 
-                     statusText.textContent = 'Dekatkan Kartu Pelajar Anda...'; 
-                     promptDiv.classList.add('scanning-animation'); 
-                     scanMasukButton.disabled = true; 
-                     scanPulangButton.disabled = true; 
+                statusText.textContent = 'Menunggu izin pengguna...';
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    
+                    console.log("Scan started successfully.");
+                    statusText.textContent = 'Dekatkan Kartu Pelajar Anda...';
+                    promptDiv.classList.add('scanning-animation');
+                    scanMasukButton.disabled = true;
+                    scanPulangButton.disabled = true;
 
-                     ndef.onreadingerror = () => { 
-                         console.log("Error reading NFC tag."); 
-                         statusText.textContent = 'Gagal membaca kartu. Coba lagi.'; 
-                         resetUI(); 
-                     }; 
+                    ndef.onreadingerror = () => {
+                        console.log("Error reading NFC tag.");
+                        statusText.textContent = 'Gagal membaca kartu. Coba lagi.';
+                        resetUI();
+                    };
 
-                     ndef.onreading = event => { 
-                         console.log("NFC tag read successfully."); 
-                         const serialNumber = event.serialNumber; 
-                         const timestamp = new Date().toISOString(); 
-                          
-                         statusText.textContent = 'Kartu berhasil dibaca!'; 
-                         promptDiv.classList.remove('scanning-animation'); 
-                          
-                         sendDataToGoogleSheet(serialNumber, scanType, timestamp); 
-                     }; 
+                    ndef.onreading = event => {
+                        console.log("NFC tag read successfully.");
+                        const serialNumber = event.serialNumber;
+                        const timestamp = new Date().toISOString();
+                        
+                        statusText.textContent = 'Kartu berhasil dibaca!';
+                        promptDiv.classList.remove('scanning-animation');
+                        
+                        // Kirim data ke Google Sheet
+                        sendDataToGoogleSheet(serialNumber, scanType, timestamp);
+                    };
 
-                 } catch (error) { 
-                     console.error(`Error! Scan failed to start: ${error}.`); 
-                     statusText.textContent = 'Gagal memulai pemindaian.'; 
-                     resetUI(); 
-                 } 
-             }; 
-              
-             // === BARU: Fungsi untuk mengirim notifikasi WhatsApp otomatis ===
-             const sendAutomaticNotifications = (originalUrl) => {
-                 if (!originalUrl) {
-                     console.log("Tidak ada URL WhatsApp yang diterima dari server.");
-                     return;
-                 }
+                } catch (error) {
+                    console.error(`Error! Scan failed to start: ${error}.`);
+                    statusText.textContent = 'Gagal memulai pemindaian.';
+                    resetUI();
+                }
+            };
 
-                 // 1. Kirim notifikasi ke nomor orang tua yang sesuai (dari server)
-                 window.open(originalUrl, '_blank');
-                 console.log(`Mencoba membuka notifikasi untuk: ${originalUrl}`);
+            // Fungsi untuk mengirim data ke Google Apps Script
+            const sendDataToGoogleSheet = async (serialNumber, scanType, timestamp) => {
+                loadingOverlay.classList.remove('hidden');
+                
+                try {
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8', // Diperlukan untuk Apps Script
+                        },
+                        body: JSON.stringify({ serialNumber, scanType, timestamp }),
+                    });
 
-                 // 2. Kirim notifikasi ke nomor tetap
-                 try {
-                     const url = new URL(originalUrl);
-                     const message = url.searchParams.get('text'); // Ambil pesan dari URL asli
-                     if (message) {
-                         const fixedNumber = '6285174483488';
-                         const adminWhatsAppUrl = `https://api.whatsapp.com/send?phone=${fixedNumber}&text=${encodeURIComponent(message)}`;
-                         
-                         // Beri jeda singkat untuk membantu browser menangani dua pop-up
-                         setTimeout(() => {
-                             window.open(adminWhatsAppUrl, '_blank');
-                             console.log(`Mencoba membuka notifikasi untuk nomor tetap: ${adminWhatsAppUrl}`);
-                         }, 500); // jeda 0.5 detik
-                     }
-                 } catch (error) {
-                     console.error("Gagal membuat URL notifikasi kedua:", error);
-                 }
-             };
+                    if (!response.ok) {
+                       throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-             // Fungsi untuk mengirim data ke Google Apps Script 
-             const sendDataToGoogleSheet = async (serialNumber, scanType, timestamp) => { 
-                 loadingOverlay.classList.remove('hidden'); 
-                  
-                 try { 
-                     const response = await fetch(GAS_WEB_APP_URL, { 
-                         method: 'POST', 
-                         mode: 'cors', 
-                         headers: { 
-                             'Content-Type': 'text/plain;charset=utf-8', 
-                         }, 
-                         body: JSON.stringify({ serialNumber, scanType, timestamp }), 
-                     }); 
+                    const result = await response.json();
+                    loadingOverlay.classList.add('hidden');
 
-                     if (!response.ok) { 
-                        throw new Error(`HTTP error! status: ${response.status}`); 
-                     } 
+                    if (result.status === 'success') {
+                        showNotification('✅', 'Presensi Berhasil', `Notifikasi WhatsApp telah otomatis terkirim.`);
+                    } else {
+                        showNotification('❌', 'Presensi Gagal', result.message || 'Terjadi kesalahan di server.');
+                    }
+                } catch (error) {
+                    console.error('Error sending data to Google Sheet:', error);
+                    loadingOverlay.classList.add('hidden');
+                    showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+                } finally {
+                    resetUI();
+                }
+            };
+            
+            // Fungsi untuk menampilkan modal notifikasi
+            const showNotification = (icon, title, message) => {
+                // PERUBAHAN: Tombol WhatsApp dihapus karena notifikasi sudah otomatis
+                modalContent.innerHTML = `
+                    <div class="text-5xl mb-4">${icon}</div>
+                    <h2 class="text-2xl font-bold text-gray-800">${title}</h2>
+                    <p class="text-gray-600 mt-2">${message}</p>
+                `;
+                notificationModal.classList.remove('hidden');
+            };
 
-                     const result = await response.json(); 
-                     loadingOverlay.classList.add('hidden'); 
+            // Fungsi untuk mereset UI ke keadaan awal
+            const resetUI = () => {
+                promptDiv.classList.remove('scanning-animation');
+                scanMasukButton.disabled = false;
+                scanPulangButton.disabled = false;
+                statusText.textContent = 'Pilih tipe presensi untuk memulai.';
+            };
+            
+            // Event listener untuk tombol
+            scanMasukButton.addEventListener('click', () => startScan('Masuk'));
+            scanPulangButton.addEventListener('click', () => startScan('Pulang'));
+            closeModalButton.addEventListener('click', () => {
+                notificationModal.classList.add('hidden');
+            });
+        });
+    </script>
 
-                     if (result.status === 'success') { 
-                         // Tampilkan notifikasi di layar
-                         showNotification('✅', 'Presensi Berhasil', `Notifikasi otomatis sedang dikirim...`); 
-                         // Panggil fungsi untuk mengirim notifikasi WhatsApp
-                         sendAutomaticNotifications(result.whatsappUrl);
-                     } else { 
-                         showNotification('❌', 'Presensi Gagal', result.message || 'Terjadi kesalahan di server.'); 
-                     } 
-                 } catch (error) { 
-                     console.error('Error sending data to Google Sheet:', error); 
-                     loadingOverlay.classList.add('hidden'); 
-                     showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'); 
-                 } finally { 
-                     resetUI(); 
-                 } 
-             }; 
-              
-             // === DIPERBARUI: Fungsi untuk menampilkan modal notifikasi (tanpa tombol WA) ===
-             const showNotification = (icon, title, message) => { 
-                 modalContent.innerHTML = ` 
-                     <div class="text-5xl mb-4">${icon}</div> 
-                     <h2 class="text-2xl font-bold text-gray-800">${title}</h2> 
-                     <p class="text-gray-600 mt-2">${message}</p> 
-                 `; 
-                 notificationModal.classList.remove('hidden'); 
-             }; 
-
-             // Fungsi untuk mereset UI ke keadaan awal 
-             const resetUI = () => { 
-                 promptDiv.classList.remove('scanning-animation'); 
-                 scanMasukButton.disabled = false; 
-                 scanPulangButton.disabled = false; 
-                 statusText.textContent = 'Pilih tipe presensi untuk memulai.'; 
-             }; 
-              
-             // Event listener untuk tombol 
-             scanMasukButton.addEventListener('click', () => startScan('Masuk')); 
-             scanPulangButton.addEventListener('click', () => startScan('Pulang')); 
-             closeModalButton.addEventListener('click', () => { 
-                 notificationModal.classList.add('hidden'); 
-             }); 
-         }); 
-     </script> 
-
- </body> 
- </html>
+</body>
+</html>
