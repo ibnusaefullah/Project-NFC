@@ -12,71 +12,83 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Style untuk animasi scanning */
-        @keyframes pulse {
+        /* Gradient untuk tombol dan ikon, terinspirasi dari Instagram */
+        .instagram-gradient {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        /* Animasi untuk status scanning */
+        @keyframes pulse-light {
             0%, 100% {
+                transform: scale(1);
                 opacity: 1;
             }
             50% {
-                opacity: 0.5;
+                transform: scale(1.05);
+                opacity: 0.8;
             }
         }
         .scanning-animation {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: pulse-light 1.5s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-md mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+    <!-- Kontainer utama dengan gaya seperti aplikasi mobile -->
+    <div class="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.667 15.667L5.333 12.333a2 2 0 010-2.828l3.334-3.334a2 2 0 112.828 2.828L8.667 12.5l2.828 2.828a2 2 0 11-2.828 2.829z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.333 15.667L18.667 12.333a2 2 0 000-2.828l-3.334-3.334a2 2 0 10-2.828 2.828L15.333 12.5l-2.828 2.828a2 2 0 102.828 2.829z" />
-            </svg>
-            <h1 class="text-2xl font-bold mt-4">Pembaca Tag NFC</h1>
-            <p class="text-gray-400 mt-1">Tempelkan tag NFC ke bagian belakang ponsel Anda.</p>
-        </div>
+        <!-- Header Aplikasi -->
+        <header class="text-center py-4 border-b border-gray-200">
+            <h1 class="text-xl font-semibold text-gray-800">Presensi Peserta Didik</h1>
+        </header>
 
-        <!-- Tombol Scan -->
-        <div class="text-center mb-6">
-            <button id="scanButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
-                Mulai Memindai
-            </button>
-        </div>
-
-        <!-- Status Display -->
-        <div id="status" class="text-center bg-gray-700 rounded-lg p-3 mb-6">
-            <p id="statusText" class="font-medium text-gray-300">Siap untuk memindai...</p>
-        </div>
-
-        <!-- Hasil Scan -->
-        <div id="result" class="hidden space-y-4">
-            <div>
-                <h2 class="text-lg font-semibold text-blue-300">Nomor Seri Tag</h2>
-                <pre id="serialNumber" class="bg-gray-900 p-3 rounded-md text-sm text-gray-200 overflow-x-auto"></pre>
+        <main class="p-6 md:p-8">
+            <!-- Area Prompt -->
+            <div id="prompt" class="text-center mb-8">
+                <div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center instagram-gradient p-1">
+                    <div class="bg-white w-full h-full rounded-full flex items-center justify-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                         </svg>
+                    </div>
+                </div>
+                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai tag NFC.</p>
             </div>
-            <div>
-                <h2 class="text-lg font-semibold text-blue-300">Data dari Tag</h2>
-                <div id="records" class="space-y-2"></div>
-            </div>
-        </div>
-        
-        <!-- Pesan Error jika tidak didukung -->
-        <div id="notSupported" class="hidden text-center bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg" role="alert">
-            <strong class="font-bold">Tidak Didukung!</strong>
-            <span class="block sm:inline">Web NFC tidak didukung di browser atau perangkat ini. Coba gunakan Chrome di Android.</span>
-        </div>
 
+            <!-- Tombol Aksi -->
+            <div class="text-center mb-6">
+                <button id="scanButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-500 focus:ring-opacity-50 instagram-gradient">
+                    Mulai Memindai
+                </button>
+            </div>
+
+            <!-- Hasil Scan -->
+            <div id="result" class="hidden border-t border-gray-200 pt-4">
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-sm font-medium text-gray-500">NOMOR SERI</h2>
+                        <p id="serialNumber" class="mt-1 text-base text-gray-800 font-mono bg-gray-100 p-2 rounded-md"></p>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-medium text-gray-500">DATA TERSIMPAN</h2>
+                        <div id="records" class="mt-1 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pesan Error jika tidak didukung -->
+            <div id="notSupported" class="hidden text-center bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                <strong class="font-bold">Tidak Didukung!</strong>
+                <span class="block sm:inline">Web NFC tidak tersedia di browser atau perangkat ini.</span>
+            </div>
+        </main>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const scanButton = document.getElementById('scanButton');
             const statusText = document.getElementById('statusText');
-            const statusDiv = document.getElementById('status');
+            const promptDiv = document.getElementById('prompt');
             const resultDiv = document.getElementById('result');
             const serialNumberEl = document.getElementById('serialNumber');
             const recordsEl = document.getElementById('records');
@@ -86,7 +98,9 @@
             if (!('NDEFReader' in window)) {
                 notSupportedDiv.classList.remove('hidden');
                 scanButton.disabled = true;
-                statusDiv.classList.add('hidden');
+                scanButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusText.textContent = 'Fitur tidak didukung.';
+                return;
             }
 
             scanButton.addEventListener('click', async () => {
@@ -94,58 +108,49 @@
                 resultDiv.classList.add('hidden'); // Sembunyikan hasil sebelumnya
 
                 try {
-                    // Membuat instance NDEFReader baru
                     const ndef = new NDEFReader();
-                    
-                    // Mulai proses scanning. Ini akan menampilkan prompt di browser.
                     await ndef.scan();
                     
                     console.log("Scan started successfully.");
                     statusText.textContent = 'Dekatkan tag NFC Anda...';
-                    statusDiv.classList.add('scanning-animation');
-                    statusDiv.classList.remove('bg-gray-700');
-                    statusDiv.classList.add('bg-blue-800');
+                    promptDiv.classList.add('scanning-animation');
+                    scanButton.textContent = 'Sedang Memindai...';
 
-
-                    // Event listener ketika ada error saat membaca
                     ndef.addEventListener('readingerror', () => {
-                        console.log("Argh! Cannot read data from the NFC tag. Try another one?");
+                        console.log("Error reading NFC tag.");
                         statusText.textContent = 'Gagal membaca tag. Coba lagi.';
-                        statusDiv.classList.remove('scanning-animation', 'bg-blue-800');
-                        statusDiv.classList.add('bg-red-700');
+                        promptDiv.classList.remove('scanning-animation');
+                        scanButton.textContent = 'Mulai Memindai';
                     });
 
-                    // Event listener ketika tag berhasil dibaca
                     ndef.addEventListener('reading', ({ message, serialNumber }) => {
                         console.log(`> Serial Number: ${serialNumber}`);
                         console.log(`> Records: (${message.records.length})`);
 
-                        statusText.textContent = 'Tag berhasil terdeteksi!';
-                        statusDiv.classList.remove('scanning-animation', 'bg-blue-800');
-                        statusDiv.classList.add('bg-green-700');
+                        statusText.textContent = 'Tag berhasil dibaca!';
+                        promptDiv.classList.remove('scanning-animation');
+                        scanButton.textContent = 'Pindai Lagi';
 
                         serialNumberEl.textContent = serialNumber || 'N/A';
                         recordsEl.innerHTML = ''; // Kosongkan data sebelumnya
 
-                        // Tampilkan data yang dibaca
                         message.records.forEach(record => {
                             const recordDiv = document.createElement('div');
-                            recordDiv.className = 'bg-gray-900 p-3 rounded-md';
+                            recordDiv.className = 'bg-gray-50 border border-gray-200 p-3 rounded-md text-gray-700';
                             
                             let content = '';
                             const decoder = new TextDecoder(record.encoding);
 
                             switch (record.recordType) {
                                 case "text":
-                                    content = `<strong class="text-green-400">Teks:</strong> ${decoder.decode(record.data)}`;
+                                    content = `<strong>Teks:</strong> ${decoder.decode(record.data)}`;
                                     break;
                                 case "url":
                                     const url = decoder.decode(record.data);
-                                    content = `<strong class="text-green-400">URL:</strong> <a href="${url}" target="_blank" class="text-blue-400 hover:underline">${url}</a>`;
+                                    content = `<strong>URL:</strong> <a href="${url}" target="_blank" class="text-blue-600 hover:underline">${url}</a>`;
                                     break;
                                 default:
-                                    // Untuk tipe data lain, tampilkan sebagai teks mentah
-                                    content = `<strong class="text-green-400">Tipe (${record.recordType}):</strong> ${decoder.decode(record.data)}`;
+                                    content = `<strong>Tipe (${record.recordType}):</strong> ${decoder.decode(record.data)}`;
                             }
                             recordDiv.innerHTML = content;
                             recordsEl.appendChild(recordDiv);
@@ -157,8 +162,8 @@
                 } catch (error) {
                     console.error(`Error! Scan failed to start: ${error}.`);
                     statusText.textContent = 'Gagal memulai pemindaian.';
-                    statusDiv.classList.remove('scanning-animation', 'bg-blue-800');
-                    statusDiv.classList.add('bg-red-700');
+                    promptDiv.classList.remove('scanning-animation');
+                    scanButton.textContent = 'Mulai Memindai';
                 }
             });
         });
