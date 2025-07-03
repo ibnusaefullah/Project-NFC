@@ -52,7 +52,7 @@
                          </svg>
                     </div>
                 </div>
-                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai Kartu Pelajar NFC.</p>
+                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai Kartu Pelajar.</p>
             </div>
 
             <!-- Tombol Aksi -->
@@ -112,7 +112,7 @@
                     await ndef.scan();
                     
                     console.log("Scan started successfully.");
-                    statusText.textContent = 'Dekatkan Kartu Pelajar NFC kamu...';
+                    statusText.textContent = 'Dekatkan Kartu Pelajar kamu...';
                     promptDiv.classList.add('scanning-animation');
                     scanButton.textContent = 'Sedang Memindai...';
 
