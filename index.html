@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pembaca Tag NFC</title>
+    <title>Pembaca NISN NFC</title>
     <!-- Memuat Tailwind CSS untuk styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -12,7 +12,7 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Gradient untuk tombol dan ikon, terinspirasi dari Instagram */
+        /* Gradient untuk tombol dan ikon, terinspirasi dari InsNISNram */
         .instagram-gradient {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         }
@@ -45,14 +45,14 @@
         <main class="p-6 md:p-8">
             <!-- Area Prompt -->
             <div id="prompt" class="text-center mb-8">
-                <div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center instagram-gradient p-1">
+                <div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center insNISNram-gradient p-1">
                     <div class="bg-white w-full h-full rounded-full flex items-center justify-center">
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                          </svg>
                     </div>
                 </div>
-                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai tag NFC.</p>
+                <p id="statusText" class="text-gray-600 mt-4 font-medium">Klik untuk mulai memindai NISN NFC.</p>
             </div>
 
             <!-- Tombol Aksi -->
@@ -112,13 +112,13 @@
                     await ndef.scan();
                     
                     console.log("Scan started successfully.");
-                    statusText.textContent = 'Dekatkan tag NFC Anda...';
+                    statusText.textContent = 'Dekatkan NISN NFC Anda...';
                     promptDiv.classList.add('scanning-animation');
                     scanButton.textContent = 'Sedang Memindai...';
 
                     ndef.addEventListener('readingerror', () => {
-                        console.log("Error reading NFC tag.");
-                        statusText.textContent = 'Gagal membaca tag. Coba lagi.';
+                        console.log("Error reading NFC NISN.");
+                        statusText.textContent = 'Gagal membaca NISN. Coba lagi.';
                         promptDiv.classList.remove('scanning-animation');
                         scanButton.textContent = 'Mulai Memindai';
                     });
@@ -127,7 +127,7 @@
                         console.log(`> Serial Number: ${serialNumber}`);
                         console.log(`> Records: (${message.records.length})`);
 
-                        statusText.textContent = 'Tag berhasil dibaca!';
+                        statusText.textContent = 'NISN berhasil dibaca!';
                         promptDiv.classList.remove('scanning-animation');
                         scanButton.textContent = 'Pindai Lagi';
 
