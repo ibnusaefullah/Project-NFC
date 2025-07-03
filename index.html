@@ -70,7 +70,7 @@
     <div id="notificationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm w-full">
             <div id="modalContent">
-                </div>
+            </div>
             <button id="closeModalButton" class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Tutup</button>
         </div>
     </div>
@@ -92,7 +92,7 @@
             const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyMSTJlWWwoh2obdHOMxeSPxZ_Ssh_K7ioUchT6eGD2sBXknm0UKmCHxIVxr2j1fftv/exec';
             
             // === API KEY DARI TEXTMEBOT (JIKA ADA, JIKA TIDAK BIARKAN KOSONG) ===
-            const TEXTMEBOT_API_KEY = ''; // Ganti dengan API Key Anda jika diperlukan
+            const TEXTMEBOT_API_KEY = 'ogC7DW93kx7A'; // Ganti dengan API Key Anda jika diperlukan
 
             const scanMasukButton = document.getElementById('scanMasukButton');
             const scanPulangButton = document.getElementById('scanPulangButton');
@@ -155,20 +155,20 @@
                 }
             };
 
-            // **BARU: Fungsi untuk mengirim notifikasi WhatsApp**
             const sendWhatsAppNotification = async (phoneNumber, studentName, scanType, timestamp) => {
-                // Pastikan nomor telepon dalam format internasional (misal: 62812xxxx)
-                if (!phoneNumber || !phoneNumber.startsWith('62')) {
+                if (!phoneNumber || !phoneNumber.toString().startsWith('62')) {
                     console.error('Nomor telepon orang tua tidak valid:', phoneNumber);
-                    return; // Hentikan jika nomor tidak valid
+                    return; 
                 }
 
                 const timeString = timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
                 const message = `Pemberitahuan Presensi:\n\nAnanda: *${studentName}*\nStatus: *Berhasil Presensi ${scanType}*\nWaktu: ${timeString} WIB\n\nTerima kasih.`;
                 
-                // URL Encode pesan untuk keamanan
                 const encodedMessage = encodeURIComponent(message);
-                const apiUrl = `https://api.textmebot.com/send.php?recipient=+${6285174483488}&text=${encodedMessage}&apikey=${ogC7DW93kx7A}`;
+                
+                // --- PERBAIKAN DI SINI ---
+                // Menggunakan variabel phoneNumber dan TEXTMEBOT_API_KEY, bukan nilai hardcoded.
+                const apiUrl = `https://api.textmebot.com/send.php?recipient=+${phoneNumber}&text=${encodedMessage}&apikey=${TEXTMEBOT_API_KEY}`;
 
                 try {
                     const response = await fetch(apiUrl);
@@ -204,7 +204,6 @@
 
                     if (result.status === 'success') {
                         showNotification('✅', 'Presensi Berhasil', `Data untuk ${result.namaSiswa || 'siswa'} telah terekam. Notifikasi WhatsApp akan dikirim.`);
-                        // Panggil fungsi notifikasi setelah presensi berhasil
                         if (result.nomorOrtu) {
                            await sendWhatsAppNotification(result.nomorOrtu, result.namaSiswa, scanType, timestamp);
                         }
