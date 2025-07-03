@@ -7,39 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
-        /* Menggunakan font Inter */
-        body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Menghilangkan highlight biru saat di-tap di mobile */
-        }
-        /* Gradient untuk tombol dan ikon */
-        .instagram-gradient {
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-        }
-        /* Animasi untuk status scanning */
-        @keyframes pulse-light {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-        }
-        .scanning-animation {
-            animation: pulse-light 1.5s ease-in-out infinite;
-        }
-        /* Mencegah scrolling */
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .instagram-gradient { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        @keyframes pulse-light { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        .scanning-animation { animation: pulse-light 1.5s ease-in-out infinite; }
+        html, body { height: 100%; overflow: hidden; }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <div class="w-full h-screen bg-white flex flex-col">
-        
         <header class="text-center py-4 border-b border-gray-200 flex-shrink-0">
-            <h1 class="text-xl font-semibold text-gray-800">Presensi Peserta Didik</h1>
+            <h1 id="headerTitle" class="text-xl font-semibold text-gray-800">Presensi Peserta Didik</h1>
         </header>
 
-        <main class="flex-grow flex flex-col justify-center items-center p-6 md:p-8 overflow-y-auto">
+        <!-- View untuk Siswa (NFC Scan) -->
+        <main id="studentView" class="flex-grow flex flex-col justify-center items-center p-6 md:p-8 overflow-y-auto">
             <div id="prompt" class="text-center mb-8">
                 <div class="w-28 h-28 mx-auto rounded-full flex items-center justify-center instagram-gradient p-1">
                     <div class="bg-white w-full h-full rounded-full flex items-center justify-center">
@@ -50,8 +33,6 @@
                 </div>
                 <p id="statusText" class="text-gray-600 mt-5 font-medium text-lg">Pilih tipe presensi untuk memulai.</p>
             </div>
-
-            <!-- === PERUBAHAN POSISI TOMBOL DI SINI === -->
             <div class="w-full max-w-sm flex gap-4">
                 <button id="scanMasukButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 bg-green-600 hover:bg-green-700">
                     Presensi Masuk
@@ -60,22 +41,54 @@
                     Presensi Pulang
                 </button>
             </div>
-            
+             <div class="mt-8">
+                <button id="showLoginButton" class="text-sm text-gray-500 hover:text-gray-700">Login Guru</button>
+            </div>
             <div id="notSupported" class="hidden mt-6 text-center bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg" role="alert">
                 <strong class="font-bold">Tidak Didukung!</strong>
                 <span class="block sm:inline">Web NFC tidak tersedia di browser atau perangkat ini.</span>
             </div>
         </main>
+
+        <!-- View untuk Guru (Setelah Login) -->
+        <main id="teacherView" class="hidden flex-grow flex flex-col justify-center items-center p-6 md:p-8 overflow-y-auto">
+            <div class="w-full max-w-sm text-center">
+                <h2 class="text-lg font-medium text-gray-700 mb-4">Pilih Siswa & Keterangan</h2>
+                <select id="studentList" class="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                    <option value="">Memuat daftar siswa...</option>
+                </select>
+                <div class="grid grid-cols-3 gap-3">
+                    <button data-status="Sakit" class="teacher-action-button w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg">Sakit</button>
+                    <button data-status="Izin" class="teacher-action-button w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Izin</button>
+                    <button data-status="Alpa" class="teacher-action-button w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg">Alpa</button>
+                </div>
+                <button id="logoutButton" class="mt-8 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Logout</button>
+            </div>
+        </main>
     </div>
 
+    <!-- Modal Login Guru -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Login Guru</h2>
+            <input type="password" id="passwordInput" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Masukkan Kata Sandi">
+            <p id="loginError" class="text-red-500 text-sm mt-2 hidden">Kata sandi salah!</p>
+            <div class="flex gap-4 mt-6">
+                <button id="cancelLoginButton" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Batal</button>
+                <button id="loginButton" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Notifikasi Umum -->
     <div id="notificationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm w-full">
-            <div id="modalContent">
-            </div>
+            <div id="modalContent"></div>
             <button id="closeModalButton" class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Tutup</button>
         </div>
     </div>
     
+    <!-- Overlay Loading -->
     <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
         <div class="text-white text-center">
             <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -86,25 +99,45 @@
         </div>
     </div>
 
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // === URL WEB APP ANDA DARI GOOGLE APPS SCRIPT ===
-            const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyMSTJlWWwoh2obdHOMxeSPxZ_Ssh_K7ioUchT6eGD2sBXknm0UKmCHxIVxr2j1fftv/exec';
-            
-            // === API KEY DARI TEXTMEBOT (JIKA ADA, JIKA TIDAK BIARKAN KOSONG) ===
-            const TEXTMEBOT_API_KEY = 'ogC7DW93kx7A'; // Ganti dengan API Key Anda jika diperlukan
+            // --- KONFIGURASI ---
+            const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKHeGPgI1OQONJnv7gFfggQaoPsGIhGPzzTlvEeoL0CWfGq-FU240Qh_PLUJ0m-7Oj/exec';
+            const TEXTMEBOT_API_KEY = 'ogC7DW93kx7A';
+            const TEACHER_PASSWORD = 'guru'; // Ganti dengan kata sandi yang lebih aman
 
+            // --- Elemen UI ---
+            const studentView = document.getElementById('studentView');
+            const teacherView = document.getElementById('teacherView');
+            const headerTitle = document.getElementById('headerTitle');
             const scanMasukButton = document.getElementById('scanMasukButton');
             const scanPulangButton = document.getElementById('scanPulangButton');
             const statusText = document.getElementById('statusText');
             const promptDiv = document.getElementById('prompt');
             const notSupportedDiv = document.getElementById('notSupported');
             const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Elemen Modal Notifikasi
             const notificationModal = document.getElementById('notificationModal');
             const modalContent = document.getElementById('modalContent');
             const closeModalButton = document.getElementById('closeModalButton');
 
+            // Elemen Login
+            const loginModal = document.getElementById('loginModal');
+            const showLoginButton = document.getElementById('showLoginButton');
+            const loginButton = document.getElementById('loginButton');
+            const cancelLoginButton = document.getElementById('cancelLoginButton');
+            const passwordInput = document.getElementById('passwordInput');
+            const loginError = document.getElementById('loginError');
+
+            // Elemen Dasbor Guru
+            const studentList = document.getElementById('studentList');
+            const logoutButton = document.getElementById('logoutButton');
+            const teacherActionButtons = document.querySelectorAll('.teacher-action-button');
+
+            // --- Logika Utama ---
+
+            // Cek Dukungan Web NFC
             if (!('NDEFReader' in window)) {
                 notSupportedDiv.classList.remove('hidden');
                 scanMasukButton.disabled = true;
@@ -112,15 +145,10 @@
                 scanMasukButton.classList.add('opacity-50', 'cursor-not-allowed');
                 scanPulangButton.classList.add('opacity-50', 'cursor-not-allowed');
                 statusText.textContent = 'Fitur tidak didukung.';
-                return;
             }
 
+            // Fungsi untuk memulai scan NFC
             const startScan = async (scanType) => {
-                if (GAS_WEB_APP_URL.includes('GANTI_DENGAN_URL_ANDA')) {
-                    alert('PENTING: Harap ganti placeholder GAS_WEB_APP_URL di dalam kode JavaScript dengan URL Web App Anda yang sebenarnya.');
-                    return;
-                }
-
                 statusText.textContent = 'Menunggu izin pengguna...';
                 try {
                     const ndef = new NDEFReader();
@@ -141,129 +169,194 @@
                     ndef.onreading = event => {
                         console.log("NFC tag read successfully.");
                         const serialNumber = event.serialNumber;
-                        const timestamp = new Date(); // Menggunakan objek Date
+                        const timestamp = new Date();
                         
                         statusText.textContent = 'Kartu berhasil dibaca!';
                         promptDiv.classList.remove('scanning-animation');
                         
-                        sendDataToGoogleSheet(serialNumber, scanType, timestamp);
+                        sendDataToGoogleSheet({ serialNumber, scanType, timestamp: timestamp.toISOString() }, timestamp);
                     };
-
                 } catch (error) {
                     console.error(`Error! Scan failed to start: ${error}.`);
                     statusText.textContent = 'Gagal memulai pemindaian.';
                     resetUI();
                 }
             };
-
-            // --- FUNGSI DIPERBARUI ---
-            const sendWhatsAppNotification = async (phoneNumber, studentName, scanType, timestamp) => {
+            
+            // Fungsi untuk mengirim notifikasi WhatsApp dengan format baru
+            const sendWhatsAppNotification = async (phoneNumber, studentName, status, timestamp) => {
                 if (!phoneNumber || !phoneNumber.toString().startsWith('62')) {
                     console.error('Nomor telepon orang tua tidak valid:', phoneNumber);
                     return; 
                 }
-
-                // Opsi untuk format tanggal dan waktu
                 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 const formattedDate = timestamp.toLocaleDateString('id-ID', dateOptions);
                 const timeString = timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
                 
                 let message = '';
+                let title = '';
 
-                // Membuat pesan berdasarkan tipe presensi
-                if (scanType === 'Masuk') {
-                    message = `Assalamu’alaikum Warahmatullahi Wabarakatuh.\n\n` +
-                              `Kami informasikan bahwa ananda *${studentName}* telah melakukan presensi masuk pada:\n\n` +
-                              `🗓️ Hari/Tanggal: ${formattedDate}\n` +
-                              `🕒 Waktu: ${timeString} WIB\n` +
-                              `📍 Lokasi: UPTD SD Negeri 3 Pekandangan\n\n` +
-                              `Semoga kegiatan belajar hari ini berjalan lancar dan penuh semangat. Terima kasih atas perhatian dan doa dari orang tua/wali.`;
-                } else if (scanType === 'Pulang') {
-                    message = `Assalamu’alaikum Warahmatullahi Wabarakatuh.\n\n` +
-                              `Kami informasikan bahwa ananda *${studentName}* telah melakukan presensi pulang dari sekolah pada:\n\n` +
-                              `🗓️ Hari/Tanggal: ${formattedDate}\n` +
-                              `🕒 Waktu: ${timeString} WIB\n` +
-                              `📍 Lokasi: UPTD SD Negeri 3 Pekandangan\n\n` +
-                              `Mohon kepada orang tua/wali untuk segera menjemput ananda demi kenyamanan dan keamanan bersama.\n` +
-                              `Terima kasih atas perhatian dan kerjasamanya.`;
-                } else {
-                    // Fallback jika tipe scan tidak dikenali
-                    message = `Pemberitahuan Presensi:\n\nAnanda: *${studentName}*\nStatus: *Berhasil Presensi ${scanType}*\nWaktu: ${timeString} WIB\n\nTerima kasih.`;
+                switch(status) {
+                    case 'Masuk':
+                        title = 'Pemberitahuan Presensi Masuk';
+                        message = `Kami informasikan bahwa ananda *${studentName}* telah melakukan presensi masuk pada:\n\n` +
+                                  `🗓️ Hari/Tanggal: ${formattedDate}\n` +
+                                  `🕒 Waktu: ${timeString} WIB\n` +
+                                  `📍 Lokasi: UPTD SD Negeri 3 Pekandangan\n\n` +
+                                  `Semoga kegiatan belajar hari ini berjalan lancar dan penuh semangat. Terima kasih atas perhatian dan doa dari orang tua/wali.`;
+                        break;
+                    case 'Pulang':
+                        title = 'Pemberitahuan Presensi Pulang';
+                        message = `Kami informasikan bahwa ananda *${studentName}* telah melakukan presensi pulang dari sekolah pada:\n\n` +
+                                  `🗓️ Hari/Tanggal: ${formattedDate}\n` +
+                                  `🕒 Waktu: ${timeString} WIB\n` +
+                                  `📍 Lokasi: UPTD SD Negeri 3 Pekandangan\n\n` +
+                                  `Mohon kepada orang tua/wali untuk segera menjemput ananda demi kenyamanan dan keamanan bersama.\n` +
+                                  `Terima kasih atas perhatian dan kerjasamanya.`;
+                        break;
+                    case 'Sakit':
+                    case 'Izin':
+                    case 'Alpa':
+                        title = `Pemberitahuan Keterangan Siswa`;
+                        message = `Kami informasikan bahwa ananda *${studentName}* pada hari ini, ${formattedDate}, dinyatakan *${status}*.\n\n` +
+                                  `Terima kasih atas perhatiannya.`;
+                        break;
+                    default:
+                        return; // Jangan kirim jika status tidak dikenali
                 }
-                
-                const encodedMessage = encodeURIComponent(message);
+
+                const fullMessage = `*${title}*\n\nAssalamu’alaikum Warahmatullahi Wabarakatuh.\n\n${message}`;
+                const encodedMessage = encodeURIComponent(fullMessage);
                 const apiUrl = `https://api.textmebot.com/send.php?recipient=+${phoneNumber}&text=${encodedMessage}&apikey=${TEXTMEBOT_API_KEY}`;
 
                 try {
                     const response = await fetch(apiUrl);
-                    if (response.ok) {
-                        console.log('Notifikasi WhatsApp berhasil dikirim.');
-                    } else {
-                        console.error('Gagal mengirim notifikasi WhatsApp.', await response.text());
-                    }
+                    if (response.ok) console.log('Notifikasi WhatsApp berhasil dikirim.');
+                    else console.error('Gagal mengirim notifikasi WhatsApp.', await response.text());
                 } catch (error) {
                     console.error('Error saat mengirim notifikasi WhatsApp:', error);
                 }
             };
             
-            const sendDataToGoogleSheet = async (serialNumber, scanType, timestamp) => {
+            // Fungsi umum untuk mengirim data ke Google Sheet
+            const sendDataToGoogleSheet = async (payload, timestamp) => {
                 loadingOverlay.classList.remove('hidden');
-                
                 try {
                     const response = await fetch(GAS_WEB_APP_URL, {
                         method: 'POST',
                         mode: 'cors',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8',
-                        },
-                        body: JSON.stringify({ serialNumber, scanType, timestamp: timestamp.toISOString() }),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload),
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                     const result = await response.json();
-                    loadingOverlay.classList.add('hidden');
-
                     if (result.status === 'success') {
-                        showNotification('✅', 'Presensi Berhasil', `Data untuk ${result.namaSiswa || 'siswa'} telah terekam. Notifikasi WhatsApp akan dikirim.`);
-                        if (result.nomorOrtu) {
-                           await sendWhatsAppNotification(result.nomorOrtu, result.namaSiswa, scanType, timestamp);
+                        showNotification('✅', 'Berhasil', result.message);
+                        if (result.nomorOrtu && result.namaSiswa) {
+                           await sendWhatsAppNotification(result.nomorOrtu, result.namaSiswa, payload.scanType || payload.status, timestamp);
                         }
                     } else {
-                        showNotification('❌', 'Presensi Gagal', result.message || 'Terjadi kesalahan di server.');
+                        showNotification('❌', 'Gagal', result.message || 'Terjadi kesalahan di server.');
                     }
                 } catch (error) {
-                    console.error('Error sending data to Google Sheet:', error);
-                    loadingOverlay.classList.add('hidden');
-                    showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+                    console.error('Error sending data:', error);
+                    showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server.');
                 } finally {
+                    loadingOverlay.classList.add('hidden');
                     resetUI();
                 }
             };
             
+            // --- Logika Guru ---
+            const handleLogin = async () => {
+                if (passwordInput.value === TEACHER_PASSWORD) {
+                    loginError.classList.add('hidden');
+                    loginModal.classList.add('hidden');
+                    studentView.classList.add('hidden');
+                    teacherView.classList.remove('hidden');
+                    headerTitle.textContent = "Dasbor Guru";
+                    await fetchStudentList();
+                } else {
+                    loginError.classList.remove('hidden');
+                }
+            };
+
+            const fetchStudentList = async () => {
+                try {
+                    const response = await fetch(GAS_WEB_APP_URL);
+                    if (!response.ok) throw new Error('Gagal mengambil daftar siswa');
+                    const students = await response.json();
+                    studentList.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+                    students.forEach(student => {
+                        if(student.nama && student.serialNumber) {
+                            const option = document.createElement('option');
+                            option.value = student.serialNumber;
+                            option.textContent = student.nama;
+                            studentList.appendChild(option);
+                        }
+                    });
+                } catch (error) {
+                    console.error(error);
+                    studentList.innerHTML = '<option value="">Gagal memuat data</option>';
+                }
+            };
+
+            const handleTeacherAction = (e) => {
+                const status = e.target.dataset.status;
+                const selectedSerialNumber = studentList.value;
+                const selectedStudentName = studentList.options[studentList.selectedIndex].text;
+
+                if (!selectedSerialNumber) {
+                    showNotification('⚠️', 'Perhatian', 'Silakan pilih siswa terlebih dahulu.');
+                    return;
+                }
+                
+                const payload = {
+                    serialNumber: selectedSerialNumber,
+                    status: status,
+                    timestamp: new Date().toISOString()
+                };
+                
+                sendDataToGoogleSheet(payload, new Date());
+            };
+
+            const handleLogout = () => {
+                teacherView.classList.add('hidden');
+                studentView.classList.remove('hidden');
+                headerTitle.textContent = "Presensi Peserta Didik";
+                passwordInput.value = '';
+            };
+
+            // --- UI & Utility ---
             const showNotification = (icon, title, message) => {
-                modalContent.innerHTML = `
-                    <div class="text-5xl mb-4">${icon}</div>
-                    <h2 class="text-2xl font-bold text-gray-800">${title}</h2>
-                    <p class="text-gray-600 mt-2">${message}</p>
-                `;
+                modalContent.innerHTML = `<div class="text-5xl mb-4">${icon}</div><h2 class="text-2xl font-bold text-gray-800">${title}</h2><p class="text-gray-600 mt-2">${message}</p>`;
                 notificationModal.classList.remove('hidden');
             };
 
             const resetUI = () => {
                 promptDiv.classList.remove('scanning-animation');
+                if(!('NDEFReader' in window)) return;
                 scanMasukButton.disabled = false;
                 scanPulangButton.disabled = false;
                 statusText.textContent = 'Pilih tipe presensi untuk memulai.';
             };
             
+            // --- Event Listeners ---
             scanMasukButton.addEventListener('click', () => startScan('Masuk'));
             scanPulangButton.addEventListener('click', () => startScan('Pulang'));
-            closeModalButton.addEventListener('click', () => {
-                notificationModal.classList.add('hidden');
-            });
+            closeModalButton.addEventListener('click', () => notificationModal.classList.add('hidden'));
+            
+            // Event Listener Login
+            showLoginButton.addEventListener('click', () => loginModal.classList.remove('hidden'));
+            cancelLoginButton.addEventListener('click', () => loginModal.classList.add('hidden'));
+            loginButton.addEventListener('click', handleLogin);
+            passwordInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleLogin(); });
+
+            // Event Listener Dasbor Guru
+            teacherActionButtons.forEach(button => button.addEventListener('click', handleTeacherAction));
+            logoutButton.addEventListener('click', handleLogout);
         });
     </script>
 
