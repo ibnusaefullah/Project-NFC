@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Presensi Peserta Didik</title>
-    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
@@ -34,29 +33,24 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Kontainer utama full-screen -->
     <div class="w-full h-screen bg-white flex flex-col">
         
-        <!-- Header Aplikasi -->
         <header class="text-center py-4 border-b border-gray-200 flex-shrink-0">
             <h1 class="text-xl font-semibold text-gray-800">Presensi Peserta Didik</h1>
         </header>
 
-        <!-- Konten Utama -->
         <main class="flex-grow flex flex-col justify-center items-center p-6 md:p-8 overflow-y-auto">
-            <!-- Area Prompt -->
             <div id="prompt" class="text-center mb-8">
                 <div class="w-28 h-28 mx-auto rounded-full flex items-center justify-center instagram-gradient p-1">
                     <div class="bg-white w-full h-full rounded-full flex items-center justify-center">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
                     </div>
                 </div>
                 <p id="statusText" class="text-gray-600 mt-5 font-medium text-lg">Pilih tipe presensi untuk memulai.</p>
             </div>
 
-            <!-- Tombol Aksi -->
             <div class="w-full max-w-xs space-y-4">
                 <button id="scanMasukButton" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 bg-green-600 hover:bg-green-700">
                     Presensi Masuk
@@ -66,7 +60,6 @@
                 </button>
             </div>
             
-            <!-- Pesan Error jika tidak didukung -->
             <div id="notSupported" class="hidden mt-6 text-center bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg" role="alert">
                 <strong class="font-bold">Tidak Didukung!</strong>
                 <span class="block sm:inline">Web NFC tidak tersedia di browser atau perangkat ini.</span>
@@ -74,17 +67,14 @@
         </main>
     </div>
 
-    <!-- Modal Notifikasi -->
     <div id="notificationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm w-full">
             <div id="modalContent">
-                <!-- Konten dinamis dari JS -->
-            </div>
+                </div>
             <button id="closeModalButton" class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Tutup</button>
         </div>
     </div>
     
-    <!-- Overlay Loading -->
     <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
         <div class="text-white text-center">
             <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -100,6 +90,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             // === URL WEB APP ANDA DARI GOOGLE APPS SCRIPT ===
             const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxtQ3-VLEY_Y6pMCOKAgGg8PKwBG6rvHS6EbcByAQztLn3TLp0FmIMDVa71lcXESWlo/exec';
+            
+            // === API KEY DARI TEXTMEBOT (JIKA ADA, JIKA TIDAK BIARKAN KOSONG) ===
+            const TEXTMEBOT_API_KEY = ''; // Ganti dengan API Key Anda jika diperlukan
 
             const scanMasukButton = document.getElementById('scanMasukButton');
             const scanPulangButton = document.getElementById('scanPulangButton');
@@ -111,7 +104,6 @@
             const modalContent = document.getElementById('modalContent');
             const closeModalButton = document.getElementById('closeModalButton');
 
-            // Cek dukungan Web NFC
             if (!('NDEFReader' in window)) {
                 notSupportedDiv.classList.remove('hidden');
                 scanMasukButton.disabled = true;
@@ -122,7 +114,6 @@
                 return;
             }
 
-            // Fungsi untuk memulai scan
             const startScan = async (scanType) => {
                 if (GAS_WEB_APP_URL.includes('GANTI_DENGAN_URL_ANDA')) {
                     alert('PENTING: Harap ganti placeholder GAS_WEB_APP_URL di dalam kode JavaScript dengan URL Web App Anda yang sebenarnya.');
@@ -149,12 +140,11 @@
                     ndef.onreading = event => {
                         console.log("NFC tag read successfully.");
                         const serialNumber = event.serialNumber;
-                        const timestamp = new Date().toISOString();
+                        const timestamp = new Date(); // Menggunakan objek Date
                         
                         statusText.textContent = 'Kartu berhasil dibaca!';
                         promptDiv.classList.remove('scanning-animation');
                         
-                        // Kirim data ke Google Sheet
                         sendDataToGoogleSheet(serialNumber, scanType, timestamp);
                     };
 
@@ -165,7 +155,33 @@
                 }
             };
 
-            // Fungsi untuk mengirim data ke Google Apps Script
+            // **BARU: Fungsi untuk mengirim notifikasi WhatsApp**
+            const sendWhatsAppNotification = async (phoneNumber, studentName, scanType, timestamp) => {
+                // Pastikan nomor telepon dalam format internasional (misal: 62812xxxx)
+                if (!phoneNumber || !phoneNumber.startsWith('62')) {
+                    console.error('Nomor telepon orang tua tidak valid:', phoneNumber);
+                    return; // Hentikan jika nomor tidak valid
+                }
+
+                const timeString = timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const message = `Pemberitahuan Presensi:\n\nAnanda: *${studentName}*\nStatus: *Berhasil Presensi ${scanType}*\nWaktu: ${timeString} WIB\n\nTerima kasih.`;
+                
+                // URL Encode pesan untuk keamanan
+                const encodedMessage = encodeURIComponent(message);
+                const apiUrl = `https://api.textmebot.com/send.php?recipient=+${phoneNumber}&text=${encodedMessage}&apikey=${TEXTMEBOT_API_KEY}`;
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (response.ok) {
+                        console.log('Notifikasi WhatsApp berhasil dikirim.');
+                    } else {
+                        console.error('Gagal mengirim notifikasi WhatsApp.', await response.text());
+                    }
+                } catch (error) {
+                    console.error('Error saat mengirim notifikasi WhatsApp:', error);
+                }
+            };
+            
             const sendDataToGoogleSheet = async (serialNumber, scanType, timestamp) => {
                 loadingOverlay.classList.remove('hidden');
                 
@@ -174,20 +190,24 @@
                         method: 'POST',
                         mode: 'cors',
                         headers: {
-                            'Content-Type': 'text/plain;charset=utf-8', // Diperlukan untuk Apps Script
+                            'Content-Type': 'text/plain;charset=utf-8',
                         },
-                        body: JSON.stringify({ serialNumber, scanType, timestamp }),
+                        body: JSON.stringify({ serialNumber, scanType, timestamp: timestamp.toISOString() }),
                     });
 
                     if (!response.ok) {
-                       throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
                     const result = await response.json();
                     loadingOverlay.classList.add('hidden');
 
                     if (result.status === 'success') {
-                        showNotification('✅', 'Presensi Berhasil', `Notifikasi WhatsApp telah otomatis terkirim.`);
+                        showNotification('✅', 'Presensi Berhasil', `Data untuk ${result.namaSiswa || 'siswa'} telah terekam. Notifikasi WhatsApp akan dikirim.`);
+                        // Panggil fungsi notifikasi setelah presensi berhasil
+                        if (result.nomorOrtu) {
+                           await sendWhatsAppNotification(result.nomorOrtu, result.namaSiswa, scanType, timestamp);
+                        }
                     } else {
                         showNotification('❌', 'Presensi Gagal', result.message || 'Terjadi kesalahan di server.');
                     }
@@ -200,9 +220,7 @@
                 }
             };
             
-            // Fungsi untuk menampilkan modal notifikasi
             const showNotification = (icon, title, message) => {
-                // PERUBAHAN: Tombol WhatsApp dihapus karena notifikasi sudah otomatis
                 modalContent.innerHTML = `
                     <div class="text-5xl mb-4">${icon}</div>
                     <h2 class="text-2xl font-bold text-gray-800">${title}</h2>
@@ -211,7 +229,6 @@
                 notificationModal.classList.remove('hidden');
             };
 
-            // Fungsi untuk mereset UI ke keadaan awal
             const resetUI = () => {
                 promptDiv.classList.remove('scanning-animation');
                 scanMasukButton.disabled = false;
@@ -219,7 +236,6 @@
                 statusText.textContent = 'Pilih tipe presensi untuk memulai.';
             };
             
-            // Event listener untuk tombol
             scanMasukButton.addEventListener('click', () => startScan('Masuk'));
             scanPulangButton.addEventListener('click', () => startScan('Pulang'));
             closeModalButton.addEventListener('click', () => {
