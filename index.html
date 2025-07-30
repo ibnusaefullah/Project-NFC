@@ -12,8 +12,15 @@
         @keyframes pulse-light { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         .scanning-animation { animation: pulse-light 1.5s ease-in-out infinite; }
         html, body { height: 100%; overflow: hidden; }
-        /* Mengubah warna latar menjadi hitam pekat */
         .dark .dark\:bg-black { background-color: #000; }
+        /* Scrollbar styling for recap modal */
+        .modal-body::-webkit-scrollbar { width: 8px; }
+        .modal-body::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .dark .modal-body::-webkit-scrollbar-track { background: #2d3748; }
+        .modal-body::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        .dark .modal-body::-webkit-scrollbar-thumb { background: #555; }
+        .modal-body::-webkit-scrollbar-thumb:hover { background: #555; }
+        .dark .modal-body::-webkit-scrollbar-thumb:hover { background: #777; }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-black">
@@ -47,27 +54,72 @@
              <div class="mt-8"><button id="showLoginButton" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">Login Guru</button></div>
         </main>
 
-        <main id="teacherView" class="hidden flex-grow flex flex-col justify-center items-center p-6 md:p-8">
-            <div class="w-full max-w-sm text-center">
-                <h2 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Pilih Siswa & Keterangan</h2>
-                <div class="flex gap-2 mb-4">
-                    <select id="studentList" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"></select>
-                    <button id="teacherScanButton" class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" aria-label="Pindai Kartu Siswa">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    </button>
+        <main id="teacherView" class="hidden flex-grow flex flex-col items-center p-4 md:p-6 overflow-y-auto">
+            <div class="w-full max-w-md space-y-4">
+                <!-- Pemilihan Siswa -->
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Pilih Siswa</h2>
+                    <div class="flex gap-2">
+                        <select id="studentList" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"></select>
+                        <button id="teacherScanButton" class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" aria-label="Pindai Kartu Siswa">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </button>
+                    </div>
                 </div>
-                <!-- Area Tampilan Kehadiran -->
-                <div id="attendanceDisplay" class="mb-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
-                    <div class="text-sm text-gray-600 dark:text-gray-300">Kehadiran Bulan Ini</div>
-                    <div id="attendancePercentage" class="text-2xl font-bold text-gray-800 dark:text-white">--%</div>
-                    <div id="attendanceDetails" class="text-xs text-gray-500 dark:text-gray-400">Hadir: -/- hari</div>
+                
+                <!-- Registrasi Siswa Baru -->
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Registrasi Siswa Baru</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="newStudentName" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Nama Siswa</label>
+                            <input type="text" id="newStudentName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div>
+                            <label for="newParentPhone" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Nomor WA Orang Tua</label>
+                            <input type="tel" id="newParentPhone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Contoh: 628123456789">
+                        </div>
+                        <div>
+                            <label for="newSerialNumber" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Serial Number (NFC)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="newSerialNumber" class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300" placeholder="Pindai kartu untuk mengisi" readonly>
+                                <button id="scanNewCardButton" class="p-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg" aria-label="Pindai Kartu Baru">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10m0-2s2 1 3 2m-3-4a2 2 0 114 0m-4 0a2 2 0 10-4 0m12 12A8 8 0 016.343 7.343m11.314 11.314a8 8 0 01-11.314 0"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button id="saveStudentButton" class="w-full text-white bg-green-600 hover:bg-green-700 font-bold py-2.5 px-4 rounded-lg">Simpan Siswa Baru</button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <button data-status="Sakit" class="teacher-action-button w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg">Sakit</button>
-                    <button data-status="Izin" class="teacher-action-button w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Izin</button>
-                    <button data-status="Alpa" class="teacher-action-button w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg">Alpa</button>
+
+                <!-- Absensi Manual -->
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Absensi Manual (Tanpa Kartu)</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                         <button id="manualCheckIn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg">Masuk</button>
+                         <button id="manualCheckOut" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg">Pulang</button>
+                    </div>
                 </div>
-                <button id="logoutButton" class="mt-8 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Logout</button>
+
+                <!-- Keterangan Lainnya -->
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Input Keterangan Lainnya</h2>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button data-status="Sakit" class="teacher-action-button w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg">Sakit</button>
+                        <button data-status="Izin" class="teacher-action-button w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Izin</button>
+                        <button data-status="Alpa" class="teacher-action-button w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg">Alpa</button>
+                    </div>
+                </div>
+
+                <!-- Laporan & Keluar -->
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Laporan & Pengaturan</h2>
+                     <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button id="showRecapButton" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg">Rekap Absensi</button>
+                        <button id="exportDataButton" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg">Export Data (CSV)</button>
+                    </div>
+                    <button id="logoutButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Logout</button>
+                </div>
             </div>
         </main>
     </div>
@@ -91,14 +143,25 @@
         </div>
     </div>
     <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="text-white text-center"><svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="mt-4 text-lg">Mengirim data...</p></div>
+        <div class="text-white text-center"><svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p id="loadingText" class="mt-4 text-lg">Mengirim data...</p></div>
     </div>
+    <!-- Recap Modal -->
+    <div id="recapModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 max-w-lg w-full flex flex-col" style="max-height: 90vh;">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex-shrink-0">Rekap Absensi Bulan Ini</h2>
+            <div id="recapContent" class="modal-body flex-grow overflow-y-auto pr-2">
+                <!-- Recap content will be injected here -->
+            </div>
+            <button id="closeRecapModalButton" class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500 flex-shrink-0">Tutup</button>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- KONFIGURASI ---
             const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPMYuF4yZbXmzlJ29h5gD_OoKn7ccwnzUUVDzqTuQIM56TEC0UA5gNRjnWakbPIcIg/exec';
-            const TEXTMEBOT_API_KEY = 'ogC7DW93kx7A';
+            const WA_API_KEY = 'ogC7DW93kx7A';
             const TEACHER_PASSWORD = 'guru';
 
             // --- Variabel Global ---
@@ -111,21 +174,51 @@
             const statusText = document.getElementById('statusText');
             const promptDiv = document.getElementById('prompt');
             const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
             
-            // Elemen Notifikasi & Login
+            // Elemen Notifikasi, Login & Recap
             const notificationModal = document.getElementById('notificationModal');
             const modalContent = document.getElementById('modalContent');
             const closeModalButton = document.getElementById('closeModalButton');
             const loginModal = document.getElementById('loginModal');
             const passwordInput = document.getElementById('passwordInput');
             const loginError = document.getElementById('loginError');
+            const recapModal = document.getElementById('recapModal');
+            const recapContent = document.getElementById('recapContent');
+            const closeRecapModalButton = document.getElementById('closeRecapModalButton');
 
             // Elemen Dasbor Guru
             const studentList = document.getElementById('studentList');
             const teacherScanButton = document.getElementById('teacherScanButton');
-            const attendanceDisplay = document.getElementById('attendanceDisplay');
-            const attendancePercentage = document.getElementById('attendancePercentage');
-            const attendanceDetails = document.getElementById('attendanceDetails');
+            
+            // Elemen Registrasi Siswa Baru
+            const newStudentNameInput = document.getElementById('newStudentName');
+            const newParentPhoneInput = document.getElementById('newParentPhone');
+            const newSerialNumberInput = document.getElementById('newSerialNumber');
+            const scanNewCardButton = document.getElementById('scanNewCardButton');
+            const saveStudentButton = document.getElementById('saveStudentButton');
+
+            // --- UI & Utility Functions ---
+            const setLoading = (isLoading, message = '') => {
+                if (isLoading) {
+                    loadingText.textContent = message;
+                    loadingOverlay.classList.remove('hidden');
+                } else {
+                    loadingOverlay.classList.add('hidden');
+                }
+            };
+
+            const showNotification = (icon, title, message) => {
+                modalContent.innerHTML = `<div class="text-5xl mb-4">${icon}</div><h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">${title}</h2><p class="text-gray-600 dark:text-gray-400 mt-2">${message}</p>`;
+                notificationModal.classList.remove('hidden');
+            };
+
+            const resetUI = () => {
+                promptDiv.classList.remove('scanning-animation');
+                statusText.textContent = 'Pilih tipe presensi untuk memulai.';
+                document.getElementById('scanMasukButton').classList.remove('active');
+                document.getElementById('scanPulangButton').classList.remove('active');
+            };
 
             // --- Logika Mode Gelap/Terang ---
             const themeToggleBtn = document.getElementById('theme-toggle');
@@ -157,12 +250,15 @@
             // --- Logika Utama ---
             const isNfcSupported = 'NDEFReader' in window;
             if (!isNfcSupported) {
+                showNotification('⚠️', 'NFC Tidak Didukung', 'Perangkat ini tidak mendukung NFC. Pemindaian kartu tidak akan berfungsi.');
                 document.getElementById('scanMasukButton').disabled = true;
                 document.getElementById('scanPulangButton').disabled = true;
                 teacherScanButton.disabled = true;
+                scanNewCardButton.disabled = true;
             }
 
             const startScan = async (scanType, onReadCallback) => {
+                if (!isNfcSupported) return;
                 statusText.textContent = 'Menunggu izin pengguna...';
                 try {
                     const ndef = new NDEFReader();
@@ -179,7 +275,7 @@
                         onReadCallback(event.serialNumber);
                     };
                 } catch (error) {
-                    showNotification('❌', 'Error', 'Gagal memulai pemindaian NFC.');
+                    showNotification('❌', 'Error', 'Gagal memulai pemindaian NFC. Pastikan NFC diaktifkan.');
                     if (scanType === 'Siswa') resetUI();
                 }
             };
@@ -192,7 +288,7 @@
             };
             
             const sendDataToGoogleSheet = async (payload, timestamp) => {
-                loadingOverlay.classList.remove('hidden');
+                setLoading(true, 'Mengirim data...');
                 try {
                     const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -206,9 +302,9 @@
                         showNotification('❌', 'Gagal', result.message || 'Terjadi kesalahan di server.');
                     }
                 } catch (error) {
-                    showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server.');
+                    showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
                 } finally {
-                    loadingOverlay.classList.add('hidden');
+                    setLoading(false);
                     resetUI();
                 }
             };
@@ -228,11 +324,13 @@
             };
 
             const fetchStudentList = async () => {
+                setLoading(true, 'Memuat daftar siswa...');
                 try {
-                    const response = await fetch(GAS_WEB_APP_URL);
+                    const response = await fetch(`${GAS_WEB_APP_URL}?action=getStudents`);
                     if (!response.ok) throw new Error('Gagal mengambil daftar siswa');
                     allStudentsData = await response.json();
                     studentList.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+                    allStudentsData.sort((a, b) => a.nama.localeCompare(b.nama));
                     allStudentsData.forEach(student => {
                         const option = document.createElement('option');
                         option.value = student.serialNumber;
@@ -241,28 +339,18 @@
                     });
                 } catch (error) {
                     studentList.innerHTML = '<option value="">Gagal memuat data</option>';
+                    showNotification('❌', 'Gagal', 'Tidak dapat memuat daftar siswa. Periksa koneksi internet.');
+                } finally {
+                    setLoading(false);
                 }
             };
             
-            const displayAttendance = () => {
-                const selectedStudent = allStudentsData.find(s => s.serialNumber === studentList.value);
-                if (selectedStudent && selectedStudent.attendance) {
-                    const { present, totalDays, percentage } = selectedStudent.attendance;
-                    attendancePercentage.textContent = `${percentage}%`;
-                    attendanceDetails.textContent = `Hadir: ${present} / ${totalDays} hari`;
-                    attendanceDisplay.classList.remove('hidden');
-                } else {
-                    attendanceDisplay.classList.add('hidden');
-                }
-            };
-
             const handleTeacherScan = () => {
                 showNotification('📲', 'Pindai Kartu', 'Silakan dekatkan kartu siswa ke pemindai NFC.');
                 startScan('Guru', (serialNumber) => {
                     const studentExists = allStudentsData.some(s => s.serialNumber === serialNumber);
                     if (studentExists) {
                         studentList.value = serialNumber;
-                        displayAttendance();
                         showNotification('✅', 'Siswa Ditemukan', `Siswa "${studentList.options[studentList.selectedIndex].text}" telah dipilih.`);
                     } else {
                         showNotification('❌', 'Gagal', 'Kartu siswa tidak terdaftar dalam sistem.');
@@ -270,17 +358,104 @@
                 });
             };
 
-            // --- UI & Utility ---
-            const showNotification = (icon, title, message) => {
-                modalContent.innerHTML = `<div class="text-5xl mb-4">${icon}</div><h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">${title}</h2><p class="text-gray-600 dark:text-gray-400 mt-2">${message}</p>`;
-                notificationModal.classList.remove('hidden');
-            };
-
-            const resetUI = () => {
-                promptDiv.classList.remove('scanning-animation');
-                statusText.textContent = 'Pilih tipe presensi untuk memulai.';
+            const handleManualAttendance = (scanType) => {
+                if (!studentList.value) return showNotification('⚠️', 'Perhatian', 'Silakan pilih siswa terlebih dahulu.');
+                const payload = { 
+                    serialNumber: studentList.value, 
+                    scanType: scanType, 
+                    timestamp: new Date().toISOString(),
+                    manual: true
+                };
+                sendDataToGoogleSheet(payload, new Date());
             };
             
+            const registerNewStudent = async (payload) => {
+                setLoading(true, 'Mendaftarkan siswa baru...');
+                try {
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        showNotification('✅', 'Berhasil', `Siswa baru "${payload.nama}" telah berhasil didaftarkan.`);
+                        newStudentNameInput.value = '';
+                        newParentPhoneInput.value = '';
+                        newSerialNumberInput.value = '';
+                        await fetchStudentList(); // Refresh the student list
+                    } else {
+                        showNotification('❌', 'Gagal', result.message || 'Terjadi kesalahan di server saat mendaftarkan siswa.');
+                    }
+                } catch (error) {
+                    showNotification('❌', 'Koneksi Gagal', 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const showAttendanceRecap = async () => {
+                setLoading(true, 'Memuat rekap absensi...');
+                try {
+                    const response = await fetch(`${GAS_WEB_APP_URL}?action=getRecap`);
+                    if (!response.ok) throw new Error('Gagal mengambil data rekap.');
+                    const recapData = await response.json();
+                    
+                    let contentHtml = `<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Berikut adalah rekapitulasi kehadiran untuk bulan ${recapData.monthName} ${recapData.year}.</p>`;
+                    contentHtml += `<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center mb-4">
+                        <div class="p-2 bg-green-100 dark:bg-green-800 rounded-lg"><div class="font-bold text-xl">${recapData.summary.totalHadir}</div><div class="text-sm">Hadir</div></div>
+                        <div class="p-2 bg-yellow-100 dark:bg-yellow-800 rounded-lg"><div class="font-bold text-xl">${recapData.summary.totalSakit}</div><div class="text-sm">Sakit</div></div>
+                        <div class="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg"><div class="font-bold text-xl">${recapData.summary.totalIzin}</div><div class="text-sm">Izin</div></div>
+                        <div class="p-2 bg-red-100 dark:bg-red-800 rounded-lg"><div class="font-bold text-xl">${recapData.summary.totalAlpa}</div><div class="text-sm">Alpa</div></div>
+                    </div>`;
+
+                    contentHtml += `<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400"><thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"><tr><th scope="col" class="py-3 px-4">Nama Siswa</th><th scope="col" class="py-3 px-2 text-center">H</th><th scope="col" class="py-3 px-2 text-center">S</th><th scope="col" class="py-3 px-2 text-center">I</th><th scope="col" class="py-3 px-2 text-center">A</th></tr></thead><tbody>`;
+                    
+                    recapData.details.forEach(student => {
+                        contentHtml += `<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"><th scope="row" class="py-3 px-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${student.nama}</th><td class="py-3 px-2 text-center">${student.H}</td><td class="py-3 px-2 text-center">${student.S}</td><td class="py-3 px-2 text-center">${student.I}</td><td class="py-3 px-2 text-center">${student.A}</td></tr>`;
+                    });
+
+                    contentHtml += `</tbody></table>`;
+                    recapContent.innerHTML = contentHtml;
+                    recapModal.classList.remove('hidden');
+
+                } catch (error) {
+                    showNotification('❌', 'Gagal', 'Tidak dapat memuat rekap absensi. ' + error.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const exportAttendanceData = async () => {
+                setLoading(true, 'Mengekspor data...');
+                try {
+                    const response = await fetch(`${GAS_WEB_APP_URL}?action=exportCsv`);
+                    if (!response.ok) throw new Error('Gagal mengekspor data.');
+                    
+                    const csvBlob = await response.blob();
+                    const url = window.URL.createObjectURL(csvBlob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    const date = new Date();
+                    const formattedDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                    a.download = `Data_Absensi_${formattedDate}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                    showNotification('✅', 'Berhasil', 'Data absensi telah diunduh sebagai file CSV.');
+
+                } catch (error) {
+                    showNotification('❌', 'Gagal', 'Tidak dapat mengekspor data. ' + error.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
             // --- Event Listeners ---
             document.getElementById('scanMasukButton').addEventListener('click', (e) => { e.target.classList.add('active'); document.getElementById('scanPulangButton').classList.remove('active'); startScan('Siswa', handleStudentScan); });
             document.getElementById('scanPulangButton').addEventListener('click', (e) => { e.target.classList.add('active'); document.getElementById('scanMasukButton').classList.remove('active'); startScan('Siswa', handleStudentScan); });
@@ -291,21 +466,61 @@
             document.getElementById('loginButton').addEventListener('click', handleLogin);
             passwordInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleLogin(); });
 
-            studentList.addEventListener('change', displayAttendance);
+            // Guru Dashboard Listeners
             teacherScanButton.addEventListener('click', handleTeacherScan);
+            document.getElementById('manualCheckIn').addEventListener('click', () => handleManualAttendance('Masuk'));
+            document.getElementById('manualCheckOut').addEventListener('click', () => handleManualAttendance('Pulang'));
+            document.getElementById('showRecapButton').addEventListener('click', showAttendanceRecap);
+            document.getElementById('exportDataButton').addEventListener('click', exportAttendanceData);
+            closeRecapModalButton.addEventListener('click', () => recapModal.classList.add('hidden'));
+
             document.querySelectorAll('.teacher-action-button').forEach(button => button.addEventListener('click', (e) => {
                 const status = e.target.dataset.status;
                 if (!studentList.value) return showNotification('⚠️', 'Perhatian', 'Silakan pilih siswa terlebih dahulu.');
                 sendDataToGoogleSheet({ serialNumber: studentList.value, status, timestamp: new Date().toISOString() }, new Date());
             }));
+            
+            scanNewCardButton.addEventListener('click', () => {
+                showNotification('📲', 'Pindai Kartu Baru', 'Silakan dekatkan kartu NFC yang akan didaftarkan.');
+                startScan('Registrasi', (serialNumber) => {
+                    const studentExists = allStudentsData.some(s => s.serialNumber === serialNumber);
+                    if (studentExists) {
+                        showNotification('❌', 'Gagal', 'Kartu ini sudah terdaftar untuk siswa lain.');
+                        newSerialNumberInput.value = '';
+                    } else {
+                        newSerialNumberInput.value = serialNumber;
+                        showNotification('✅', 'Kartu Terbaca', 'Serial number berhasil dibaca. Silakan lengkapi data siswa.');
+                    }
+                });
+            });
+
+            saveStudentButton.addEventListener('click', () => {
+                const nama = newStudentNameInput.value.trim();
+                const nomorOrtu = newParentPhoneInput.value.trim();
+                const serialNumber = newSerialNumberInput.value.trim();
+
+                if (!nama || !nomorOrtu || !serialNumber) {
+                    showNotification('⚠️', 'Data Tidak Lengkap', 'Harap isi semua kolom dan pindai kartu terlebih dahulu.');
+                    return;
+                }
+                const payload = {
+                    action: 'registerStudent',
+                    nama: nama,
+                    nomorOrtu: nomorOrtu,
+                    serialNumber: serialNumber
+                };
+                registerNewStudent(payload);
+            });
+
             document.getElementById('logoutButton').addEventListener('click', () => {
                 teacherView.classList.add('hidden');
                 studentView.classList.remove('hidden');
                 headerTitle.textContent = "Presensi Peserta Didik";
                 passwordInput.value = '';
+                studentList.innerHTML = '';
             });
 
-            // Fungsi Notifikasi WA tidak diubah
+            // Fungsi Notifikasi WA
             const sendWhatsAppNotification = async (phoneNumber, studentName, status, timestamp) => {
                 if (!phoneNumber || !phoneNumber.toString().startsWith('62')) { return; }
                 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -320,7 +535,7 @@
                 }
                 const fullMessage = `*${title}*\n\nAssalamu’alaikum Warahmatullahi Wabarakatuh.\n\n${message}`;
                 const encodedMessage = encodeURIComponent(fullMessage);
-                const apiUrl = `https://api.textmebot.com/send.php?recipient=+${phoneNumber}&text=${encodedMessage}&apikey=${TEXTMEBOT_API_KEY}`;
+                const apiUrl = `https://api.textmebot.com/send.php?recipient=+${phoneNumber}&text=${encodedMessage}&apikey=${WA_API_KEY}`;
                 try { await fetch(apiUrl); } catch (error) { console.error('Error sending WA:', error); }
             };
         });
